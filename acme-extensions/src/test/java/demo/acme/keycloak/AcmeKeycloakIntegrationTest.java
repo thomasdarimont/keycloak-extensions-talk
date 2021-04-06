@@ -5,6 +5,7 @@ import demo.acme.keycloak.KeycloakTestSupport.UserRef;
 import demo.acme.keycloak.oidc.AgeInfoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.keycloak.TokenVerifier;
@@ -14,6 +15,7 @@ import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.IDToken;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.Consumes;
@@ -27,17 +29,17 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import static demo.acme.keycloak.KeycloakTestSupport.ADMIN_CLI;
+import static demo.acme.keycloak.KeycloakTestSupport.MASTER_REALM;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public class AcmeKeycloakIntegrationTest {
 
-    public static final String MASTER_REALM = "master";
 
     public static final String ACME_REALM = "acme";
-
-    public static final String ADMIN_CLI = "admin-cli";
 
     public static final String TEST_CLIENT = "test-client";
 
@@ -47,6 +49,8 @@ public class AcmeKeycloakIntegrationTest {
 
     public static KeycloakContainer keycloak;
 
+    static boolean keycloakLocal = true;
+
     @BeforeAll
     public static void beforeAll() throws Exception {
 
@@ -55,9 +59,13 @@ public class AcmeKeycloakIntegrationTest {
             Files.copy(Path.of("../imex/" + REALM_IMPORT_FILE), Path.of("target/classes/" + REALM_IMPORT_FILE));
         }
 
-        // TODO link theme folder
+        if (!Path.of("target/classes/cli/onstart-0001-init.cli").toFile().exists()) {
+            Path targetFile = Path.of("target/classes/cli/onstart-0001-init.cli");
+            targetFile.getParent().toFile().mkdirs();
+            Files.copy(Path.of("../cli/onstart-0001-init.cli"), targetFile);
+        }
 
-        boolean keycloakLocal = false;
+        // TODO link theme folder
 
         keycloak = KeycloakTestSupport.createKeycloakContainer(keycloakLocal, REALM_IMPORT_FILE);
 
@@ -73,9 +81,31 @@ public class AcmeKeycloakIntegrationTest {
         }
     }
 
-    /**
-     * Deploys the Keycloak extensions from the classes folder into the create Keycloak container.
-     */
+    @Test
+    public void auditListenerShouldPrintLogMessage() throws Exception{
+
+        Assumptions.assumeTrue(!keycloakLocal);
+
+        ToStringConsumer consumer = new ToStringConsumer();
+        keycloak.followOutput(consumer);
+
+        TokenService tokenService = KeycloakTestSupport.getTokenService(keycloak);
+
+        // trigger user login via ROPC
+        AccessTokenResponse accessTokenResponse = tokenService.grantToken(ACME_REALM, new Form()
+                .param("grant_type", "password")
+                .param("username", "tester")
+                .param("password", TEST_USER_PASSWORD)
+                .param("client_id", TEST_CLIENT)
+                .param("scope", "openid acme.profile acme.ageinfo")
+                .asMap());
+
+        // Allow the container log to flush
+        TimeUnit.MILLISECONDS.sleep(750);
+
+        assertThat(consumer.toUtf8String()).contains("audit userEvent");
+    }
+
     @Test
     public void ageInfoMapperShouldAddAgeClassClaim() throws Exception {
 

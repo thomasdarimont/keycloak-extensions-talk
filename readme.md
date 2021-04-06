@@ -1,5 +1,7 @@
-Developing Keycloak Extensions
+Keycloak Extension Development
 ---
+
+Code & Slides for the talk `Keycloak Extension Development - Overview & Best Practices`. 
 
 # Build
 
@@ -23,12 +25,6 @@ mvn clean verify -Pwith-integration-tests
 
 ```
 docker-compose up
-```
-
-## Run example App
-
-```
-
 ```
 
 ## Run with Docker
@@ -56,4 +52,9 @@ etc/triggerDockerExtensionDeploy.sh
 ## Export 'Acme' Realm
 ```
 etc/exportRealm.sh
+```
+
+## Run Demo App
+```
+etc/runDemoApp.sh
 ```

@@ -11,6 +11,7 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.utility.MountableFile;
 
 import javax.ws.rs.core.Response;
@@ -20,6 +21,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class KeycloakTestSupport {
+
+    public static final String MASTER_REALM = "master";
+
+    public static final String ADMIN_CLI = "admin-cli";
 
     public static KeycloakContainer createKeycloakContainer(boolean keycloakLocal, String realmImportFileName) {
 
@@ -31,6 +36,7 @@ public class KeycloakTestSupport {
 //                .withRealmImportFile(REALM_IMPORT_FILE) // broken for integration-tests outside of the IDE
                 .withCopyFileToContainer(MountableFile.forHostPath(Path.of("target/classes/" + realmImportFileName)), "/tmp/" + realmImportFileName)
                 .withEnv("KEYCLOAK_IMPORT", "/tmp/" + realmImportFileName)
+                .withCopyFileToContainer(MountableFile.forHostPath(Path.of("../cli/onstart-0001-init.cli")), "/opt/jboss/startup-scripts/onstart-0001-init.cli")
                 .withExtensionClassesFrom("target/classes");
     }
 
@@ -91,6 +97,11 @@ public class KeycloakTestSupport {
         String adminPassword;
 
         public void start() {
+            // NOOP
+        }
+
+        @Override
+        public void followOutput(Consumer<OutputFrame> consumer) {
             // NOOP
         }
     }

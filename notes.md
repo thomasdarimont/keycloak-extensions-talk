@@ -24,3 +24,31 @@ mvn clean verify io.fabric8:docker-maven-plugin:build -Pwith-integration-tests
 
 mvn clean verify -Pwith-integration-tests
 ```
+
+
+# Scratch Notes
+
+## Prepare Scratch Keycloak
+
+```
+cd scratch
+cp ~/Downloads/keycloak-12.0.4.tar.gz .
+tar xzf keycloak-12.0.4.tar.gz
+keycloak-12.0.4/bin/add-user-keycloak.sh --user admin --password admin
+```
+
+## Start Scratch Keycloak
+```
+cd scratch/keycloak-12.0.4
+bin/standalone.sh --debug -Dwildfly.statistics-enabled=true -c standalone.xml
+```
+
+## Deploy extensions
+```
+cp acme-extensions/target/acme-extensions-1.0.0-SNAPSHOT.jar scratch/keycloak-12.0.4/standalone/deployments
+```
+
+## Undeploy extensions
+```
+rm scratch/keycloak-12.0.4/standalone/deployments/*.jar
+```
