@@ -52,3 +52,8 @@ cp acme-extensions/target/acme-extensions-1.0.0-SNAPSHOT.jar scratch/keycloak-12
 ```
 rm scratch/keycloak-12.0.4/standalone/deployments/*.jar
 ```
+
+
+Scratch
+---
+
