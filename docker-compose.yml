@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  keycloak:
+    container_name: keycloak-extdev
+    image: quay.io/keycloak/keycloak:12.0.4
+    user: "1000:1000"
+    environment:
+      KEYCLOAK_USER: "admin"
+      KEYCLOAK_PASSWORD: "admin"
+      KEYCLOAK_THEME_CACHING: "false"
+      KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
+      KEYCLOAK_IMPORT: "/opt/jboss/imex/acme-realm.json"
+    command: [ "--debug", "*:8787", "--server-config", "standalone.xml" ]
+    ports:
+      - "8080:8080"
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ./acme-extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/acme-extensions.jar:z
+      - ./acme-themes/target/classes/theme/acme:/opt/jboss/keycloak/themes/acme:z
+      - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
+      - ./imex:/opt/jboss/imex:z
+      - ./cli:/opt/jboss/startup-scripts:z

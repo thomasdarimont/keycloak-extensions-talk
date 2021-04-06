@@ -1,0 +1,4 @@
+### Call ping resource as user
+GET {{KC_ISSUER_URL}}/acme-resources/ping
+Accept: application/json
+Authorization: Bearer {{testClientToken}}
