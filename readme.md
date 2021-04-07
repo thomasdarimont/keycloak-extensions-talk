@@ -4,7 +4,7 @@ Easy Keycloak Extension Development
 This repository contains the code & slides of my talk `Keycloak Extension Development - Overview & Best Practices`.
 
 This example shows how to develop and deploy a set of Keycloak extensions, custom themens and configuration to a Keycloak docker container.
-In addition to that, the example also shows how to write integration tests via Keycloak-Testcontainers and how to package all extensions and themes as a 
+In addition to that, the example also shows how to write integration tests via [Keycloak-Testcontainers](https://github.com/dasniko/testcontainers-keycloak) and how to package all extensions and themes as a 
 custom docker image.
 
 The example contains the following Keycloak extensions:
