@@ -30,7 +30,6 @@
         <assertj-core.version>3.9.1</assertj-core.version>
         <testcontainers-keycloak.version>1.6.0</testcontainers-keycloak.version>
 
-
         <!-- Tooling -->
         <auto-service.version>1.0-rc7</auto-service.version>
         <lombok.version>1.18.16</lombok.version>
